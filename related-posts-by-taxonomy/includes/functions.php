@@ -224,6 +224,7 @@ function km_rpbt_get_related_posts_html( $related_posts, $rpbt_args ) {
 		return '';
 	}
 
+	// Returns an empty string if it's not a valid type
 	$rpbt_args['type'] = km_rpbt_get_settings_type( $rpbt_args );
 	$rpbt_args         = array_merge( km_rpbt_get_default_settings( $rpbt_args['type'] ), $rpbt_args );
 
@@ -232,6 +233,19 @@ function km_rpbt_get_related_posts_html( $related_posts, $rpbt_args ) {
 	if ( ! $template ) {
 		$recursing = false;
 		return '';
+	}
+
+	/**
+	 * Filters Disallowed tags (<scipt> etc...) out of html output by default.
+	 *
+	 * @since 2.7.7
+	 *
+	 * @return boolean Srips disallowed html from output if true
+	 */
+	if ( apply_filters( 'related_posts_by_taxonomy_strip_disallowed_html', true, $rpbt_args ) ) {
+
+		// Sanitize strings that are used in the html directly (like title, before_title, ...etc)
+		$rpbt_args = km_rpbt_sanitize_html_settings( $rpbt_args );
 	}
 
 	if ( $rpbt_args['title'] ) {
@@ -262,6 +276,7 @@ function km_rpbt_get_related_posts_html( $related_posts, $rpbt_args ) {
 	}
 
 	$recursing = false;
+
 	return trim( $html );
 }
 
